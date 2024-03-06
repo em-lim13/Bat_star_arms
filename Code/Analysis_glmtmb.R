@@ -17,7 +17,6 @@ library(ggeffects)
 library(brglm) # for the community glm where there's clean separation
 library(visreg)
 
-
 # Packages for map
 library(sf)
 library(patchwork) # for inset map
@@ -418,8 +417,13 @@ coords <- table_data %>%
 
 # Load GREAT map from Nikola!
 # the documentation for the creation of this in Nikola_map_making.R
-load("~/Documents/PhD/Collaborations/Andrew Bickell/Bat_Star_Project/Data/bc_map.Rdata") 
-bc_map <- slice # rename
+# load("~/Documents/PhD/Collaborations/Andrew Bickell/Bat_Star_Project/Data/bc_map.Rdata") 
+# bc_map <- slice # rename
+
+# better map
+hakai_map <- sf::st_read("Data/Hakai_coast/COAST_TEST2.shp") %>%
+  st_sf() %>%
+  st_set_crs(4326)
 
 # Load the lower quality map so I can play with plots quickly
 potato_map <- sf::st_read("Data/Decent_shapefiles/eez.shp") %>%
@@ -437,9 +441,57 @@ sf_use_s2(FALSE)
 site_names <- as.list(paste(coords$site_num, coords$`Site name`, sep = ": "))
 
 # Make maps!
-main_map <- site_map(coord_data = coords, map_data = potato_map)
+# main_map <- site_map(coord_data = coords, map_data = hakai_map)
 
-smaller_map <- inset_map(map_data = bc_map)
+smaller_map <- inset_map(map_data = hakai_map) + 
+  annotate("text", x = -125.756795, y = 49.807494, label = "Vancouver Island", angle = 315)
+
+
+# make maps again
+# main map with 
+main_map <-
+  ggplot() +
+  geom_sf(data = hakai_map, fill = "grey", colour = "white") +
+  # add points
+  geom_sf(data = coords, 
+          alpha = 0.6,
+          fill = "#28477D",
+          pch = 21,
+          aes(size = percent,
+              colour = site_num)) +
+  coord_sf(xlim = c(-125.26, -125.09), ylim = c(48.81, 48.91), expand = FALSE) +
+  # add text
+  geom_text(data = coords,
+            aes(x = Longitude, y = Latitude, 
+                label = site_num),
+            fontface = "bold",
+            nudge_x = coords$xjit) +
+  # scale colour, size, and pch
+  scale_size_continuous(name = "Atypical stars (%)",
+                        range = c(0.1, 6),
+                        limits = c(0, 15)) + 
+  scale_colour_manual(name = "Site", 
+                    values=rep("black", 16),
+                    labels = site_names) +
+  # add aesthetic elements
+  theme_bw() +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.grid.major = element_line(color = "white"),
+        axis.text = element_text(size = 12, colour = "black"),
+        axis.title = element_text(size = 13, colour = "black"),
+        legend.title = element_text(size = 12, colour = "black"),
+        legend.text = element_text(size = 11, colour = "black"),
+        legend.margin = margin(0,0,0,0, unit="cm")) +
+  xlab("Longitude") + ylab("Latitude") +
+  # add scale bar and arrow
+  annotation_scale(location = "br", width_hint = 0.4) +
+  annotation_north_arrow(location = "br", which_north = "true", 
+                         pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                         style = north_arrow_fancy_orienteering) +
+  # guides
+  guides(size = guide_legend(order = 1),
+         label = guide_legend(order = 2)) + 
+  annotate("text", x = -125.121631, y = 48.870831, label = "Trevor Channel", angle = 45, size = 4)
 
 
 # Put site map and inset map together with patchwork
@@ -453,7 +505,7 @@ main_map +
     align_to = 'panel'
   )
 
-ggsave("Pub_figs/Fig.1_inset.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
+ggsave("Pub_figs/Fig.1b.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
 
 # Make sure to cite OSM data, "Map data © OpenStreetMap contributors" and link https://www.openstreetmap.org/copyright
 # might have to change to height = 150, width = 173 to meet journal style guide
