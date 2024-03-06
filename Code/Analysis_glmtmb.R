@@ -444,7 +444,7 @@ site_names <- as.list(paste(coords$site_num, coords$`Site name`, sep = ": "))
 # main_map <- site_map(coord_data = coords, map_data = hakai_map)
 
 smaller_map <- inset_map(map_data = hakai_map) + 
-  annotate("text", x = -125.756795, y = 49.807494, label = "Vancouver Island", angle = 315)
+  annotate("text", x = -125.756795, y = 49.807494, label = "Vancouver Island", angle = 310, size = 5)
 
 
 # make maps again
@@ -507,7 +507,7 @@ main_map +
     align_to = 'panel'
   )
 
-ggsave("Pub_figs/Fig.1_alt.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
+ggsave("Pub_figs/Fig.1.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
 
 # Make sure to cite OSM data, "Map data © OpenStreetMap contributors" and link https://www.openstreetmap.org/copyright
 # might have to change to height = 150, width = 173 to meet journal style guide
