@@ -457,8 +457,9 @@ main_map <-
           alpha = 0.6,
           fill = "#28477D",
           pch = 21,
-          aes(size = percent,
-              colour = site_num)) +
+          colour = "black",
+          aes(size = percent)) +
+              #colour = site_num
   coord_sf(xlim = c(-125.26, -125.09), ylim = c(48.81, 48.91), expand = FALSE) +
   # add text
   geom_text(data = coords,
@@ -470,9 +471,10 @@ main_map <-
   scale_size_continuous(name = "Atypical stars (%)",
                         range = c(0.1, 6),
                         limits = c(0, 15)) + 
-  scale_colour_manual(name = "Site", 
-                    values=rep("black", 16),
-                    labels = site_names) +
+  # get rid of site scale
+  #scale_colour_manual(name = "Site", 
+  #                  values=rep("black", 16),
+  #                  labels = site_names) +
   # add aesthetic elements
   theme_bw() +
   theme(panel.background = element_rect(fill = "white"),
@@ -491,7 +493,7 @@ main_map <-
   # guides
   guides(size = guide_legend(order = 1),
          label = guide_legend(order = 2)) + 
-  annotate("text", x = -125.121631, y = 48.870831, label = "Trevor Channel", angle = 45, size = 4)
+  annotate("text", x = -125.121631, y = 48.870831, label = "Trevor Channel", angle = 45, size = 5)
 
 
 # Put site map and inset map together with patchwork
@@ -505,7 +507,7 @@ main_map +
     align_to = 'panel'
   )
 
-ggsave("Pub_figs/Fig.1b.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
+ggsave("Pub_figs/Fig.1_alt.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
 
 # Make sure to cite OSM data, "Map data © OpenStreetMap contributors" and link https://www.openstreetmap.org/copyright
 # might have to change to height = 150, width = 173 to meet journal style guide
@@ -560,9 +562,9 @@ ggplot() +
               alpha = 0.3) +
   facet_wrap(~substrate, 
              strip.position = "top", 
-             labeller = as_labeller(c(S = "Sand", 
-                                      C = "Cobble", 
-                                      R = "Rock"))) +
+             labeller = as_labeller(c(S = "(a)     ", 
+                                      C = "(b)     ", 
+                                      R = "(c)     "))) +
   theme_pub()  +
   labs(y = "Probability of bat star feeding", x = "Depth (m)", colour = "Arms") +
   scale_colour_manual(values = c("#DF5E29", "#28477D"),

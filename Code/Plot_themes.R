@@ -20,7 +20,8 @@ theme_pub <- function() {
           legend.background = element_blank(),
           legend.box.background = element_rect(colour = "black"),
           # Facet
-          strip.background = element_rect(fill = "grey80", color = "grey30"),  
+          strip.background = element_rect(fill = "white", color = "white"),  
+          strip.text = element_text(hjust = 0),
           strip.text.x = element_text(size = 10, color = "black"),  
           strip.text.y = element_text(size = 10, color = "black",angle = -90))
 }
