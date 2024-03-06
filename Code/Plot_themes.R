@@ -45,6 +45,12 @@ scatter_theme <- function(data, x, y, arm){
     theme_pub()
 }
 
+# Annotation -----
+place_label <- function(label, size = 10, ...) {
+  annotate("text", label = label, x = -Inf, y = Inf, 
+           vjust = 1.4, hjust = -0.15, size = size, ...)
+}
+
 
 # Mapping -----
 # create a palette for the map
@@ -68,11 +74,10 @@ pal <- c(
 ) # Pal from https://stackoverflow.com/questions/9563711/r-color-palettes-for-many-data-classes
 # pie(rep(1, 16), col = pal)
 
-# map function for site map
+# map function for site map (the old map)
 site_map <- function(coord_data, map_data){
   ggplot() +
-    geom_sf(data = {{map_data}}, fill = "white", colour = blue) +
-    coord_sf(xlim = c(-125.26, -125.09), ylim = c(48.81, 48.91), expand = FALSE) +
+    geom_sf(data = {{map_data}}, fill = "grey", colour = "white") +
     # add points
     geom_sf(data = {{coord_data}}, 
             alpha = 0.6,
@@ -80,6 +85,8 @@ site_map <- function(coord_data, map_data){
             pch = 21,
             aes(size = percent,
                 fill = site_num)) +
+    # trim map
+    coord_sf(xlim = c(-125.26, -125.09), ylim = c(48.81, 48.91), expand = FALSE) +
     # add text
     geom_text(data = {{coord_data}},
               aes(x = Longitude, y = Latitude, 
@@ -93,18 +100,18 @@ site_map <- function(coord_data, map_data){
                           limits = c(0, 15)) + 
     scale_fill_manual(name = "Site", 
                       values = pal,
-                        labels = site_names) +
+                      labels = site_names) +
     scale_colour_manual(values = pal, guide = "none") +
     # add aesthetic elements
     theme_bw() +
-    theme(panel.background = element_rect(fill = blue),
-          panel.grid.major = element_line(color = blue),
+    theme(panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_line(color = "white"),
           axis.text = element_text(size = 12, colour = "black"),
           axis.title = element_text(size = 13, colour = "black"),
           legend.title = element_text(size = 12, colour = "black"),
           legend.text = element_text(size = 11, colour = "black"),
           legend.margin = margin(0,0,0,0, unit="cm")
-) +
+    ) +
     xlab("Longitude") + ylab("Latitude") +
     annotation_scale(location = "br", width_hint = 0.4) +
     annotation_north_arrow(location = "br", which_north = "true", 
@@ -118,14 +125,14 @@ site_map <- function(coord_data, map_data){
 # big inset map
 inset_map <- function(map_data){
   ggplot() +
-    geom_sf(data = {{map_data}}, fill = "white", colour = blue) +
+    geom_sf(data = {{map_data}}, fill = "grey", colour = "white") +
     coord_sf(xlim = c(-128.5, -123), ylim = c(48.25, 51), expand = FALSE) +
     # add red rectangle for the site map region
     geom_rect(aes(xmin = -125.26, xmax = -125.09, ymin = 48.81, ymax = 48.91), color = "red", fill = NA, inherit.aes = FALSE) +
     # add aesthetic elements
     theme_bw() +
-    theme(panel.background = element_rect(fill = blue),
-          panel.grid.major = element_line(color = blue),
+    theme(panel.background = element_rect(fill = "white"),
+          panel.grid.major = element_line(color = "white"),
           panel.border = element_rect(fill = NA, colour = "black"),
           axis.title = element_blank(),
           axis.text = element_blank(),
