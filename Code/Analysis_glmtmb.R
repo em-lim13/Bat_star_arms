@@ -1,7 +1,6 @@
 # Analysis for bat star project
 # Initially compiled by Andrew Bickell, updated and edited by Em Lim and Isabelle Côté
 # Written 2022-09-26, updated by Em on June 15, 2023 and beyond
-# rewritten to use glmtmb 
 
 
 ### Loading in required packages ----
@@ -29,8 +28,9 @@ library(emmeans)
 #multcomp fine when model doesn't have interactions (main effects only)
 library(multcomp)
 
-library(tidyverse)
-
+# package version control!
+library(renv) 
+#renv::init()
 
 # Source plot themes
 source("Code/Plot_themes.R")
@@ -45,7 +45,7 @@ table_data <- read_csv("Data/table_data.csv")
 # Data for population surveys
 species_arm_data <- community_data %>% 
   mutate(arm_number = as.factor(arm_number)) %>% 
-  mutate(arm_bin = as.factor(ifelse(arm_number =="5", 0, 1 )), 
+  mutate(arm_bin = as.factor(ifelse(arm_number == "5", 0, 1 )), 
          species = factor(species, levels = c("bat", "velcro", "leather", "ochre",  "painted", "blood", "giant_pink",  "mottled",  "vermillion")),
          site = factor(site, levels = c("Aguilar", "BMSC_Dock", "Cia", "Dixon_Inside", "Dodger_Channel", "Ellis_Island", "Goby_Town", "Ohiat", "Ross_Main", "Ross_North", "Ross_Slug", "Ross_South", "Scott's_Outside", "Scotts_Inside","Wizard_North","Wizard_South")))
 
@@ -53,6 +53,8 @@ species_arm_data <- community_data %>%
 ### Bat star only data for pop surveys 
 bat_arm_data <- species_arm_data  %>% 
   filter(species == "bat") 
+
+# We're keeping 4-armed stars in the pop level analyses, but excluding them from the following
 
 ### Morphology data 
 morphology_data <- morphology_data1 %>% 
@@ -104,6 +106,7 @@ table_data %>%
 
 ### Sea star community surveys ------
 
+### Species Analysis ###
 # Which species have the most atypical arms?
 
 ### Creating a GLM to look at atypical arm number frequency across nine sea star species 
@@ -114,9 +117,8 @@ atypical_species <- species_arm_data %>%
   filter(species != "mottled") %>%
   filter(species != "vermillion") 
 
-# I think we want all the species and we can use brglm to get estimates for the species that never had supernumerary arms
-# brglm still gives > 0 estimates ofr the stars that never had SA so let's stick with this glm for now
-
+# If we want all the species and we can use brglm to get estimates for the species that never had supernumerary arms
+# brglm still gives > 0 estimates ofr the stars that never had SA so let's stick with the glm with the 5 species that had atypical arms
 
 community_glm <- glmmTMB(arm_bin ~ species, 
                    family = binomial(link = 'logit'),
@@ -137,16 +139,6 @@ summary(glht(community_glm, mcp(species="Tukey")))
 
 
 # Generate table with atypical arm data
-sp_table <- ggpredict(community_glm, terms = "species") %>%
-  rename(species = x,
-         atypical = predicted) %>%
-  mutate(atypical_percent = round((atypical*100), digits = 2),
-         atypical_percent_se = std.error*100,
-         atypical_percent_se = round(atypical_percent_se, digits = 2))
-# this is wonky
-
-  
-# try again
 table_a <- species_arm_data %>%
   filter(arm_number != "4") %>%
   count(site, species, arm_type) %>%
@@ -205,10 +197,12 @@ table_final <- table_b %>%
          `Pisaster brevispinus` = giant_pink,
          `Site mean ± sd` = site_mean_sd,
          Site = site) %>%
-  mutate(site = str_replace(site, "_", " "))
+  mutate(Site = str_replace(Site, "_", " "))
 
 # write_csv(table_final, "species_site_table.csv")
 
+
+### Site Analysis ###
 # Which sites have the most stars with atypical arms?
 
 ### Creating a GLM to look at atypical arm number frequency across sixteen sites 
@@ -246,7 +240,7 @@ summary(glht(bat_arm_site_glm, mcp(site="Tukey")))
 
 ### Morphology comparisons -----
 
-### Colour analysis 
+### Colour analysis ###
 #Chi square test for colour 
 colour_data %>% 
   dplyr::select(colour, arm_type) %>% 
@@ -273,14 +267,16 @@ colour_glm <- glmmTMB(arm_bin ~ colour,
 plot(simulateResiduals(colour_glm))
 summary(colour_glm)
 
-colour_table <- ggpredict(colour_glm, terms = "colour") %>%
+colour_table2 <- ggpredict(colour_glm, terms = "colour") %>%
   rename(colour = x,
          atypical = predicted) %>%
   mutate(atypical_percent = round((atypical*100), digits = 2),
          atypical_percent_se = std.error*100,
          atypical_percent_se = round(atypical_percent_se, digits = 2))
+# Basically the same means
 
 
+### Oral surface area analysis ###
 ### Generating a linear model to determine if oral surface area is affected by the presence of supernumerary arms in bat stars 
 # Center arm length so the comparisons are made at the average arm length, not arm length = 0
 oral_sa_lm <- glmmTMB(area ~ arm_bin*longest_arm_centre + (1|site), 
@@ -317,37 +313,14 @@ sum_stats_feeding <- ggpredict(feeding_glm, terms = c("arm_bin", "substrate")) %
                 feeding_percent = predicted) %>% 
   as.data.frame()
 
-# could I use emtrends for discrete variables
-# table of model coeffs
 
-feed_coeffs <- coef(feeding_glm)$cond
-
-feed_coeffs <- fixef(feeding_glm)
-
-feed_coeffs <- confint(feeding_glm, level = 0.95, method = c("wald"), component = c("all", "cond", "zi", "other"), estimate = TRUE) %>%
-  as.data.frame() %>%
-  rownames_to_column() %>%
-  transmute(variable = rowname,
-            estimate = Estimate,
-         lower_CI = `2.5 %`,
-         upper_CI = `97.5 %`
-         ) %>%
-  head(- 1) %>%
-  round()
-
-write_csv(feed_coeffs, "Output/feed_coeffs.csv")
 
 ### Righting time trials ----
-
-#### need to figure out resids!!!!
-
 
 righting_time_summary1 <- righting_time_data %>% count(arms) # add the 1 7 arm star that didn't flip to this
 
 ### Generating a linear model to determine if righting time is being affected by the presence of supernumerary arms in bat stars 
 # Scale size
-
-hist(righting_time_data$time_total_s)
 
 # normal
 righting_time_gaus <- glmmTMB(time_total_s ~ arm_bin*size_centre + (1|Site),
@@ -358,11 +331,7 @@ righting_time_gamma <- glmmTMB(time_total_s ~ arm_bin*size_centre + (1|Site),
                               family = Gamma(link  = 'log'),
                               data = righting_time_data)
 
-# poisson
-righting_time_pois <- glmmTMB(time_total_s ~ arm_bin*size_centre + (1|Site),
-                              family = poisson(link  = 'log'),
-                              data = righting_time_data)
-
+# log
 righting_time_log <- glmmTMB(log(time_total_s) ~ arm_bin*size_centre + (1|Site),
                               data = righting_time_data)
 
@@ -373,8 +342,6 @@ AIC(righting_time_gaus, righting_time_gamma, righting_time_pois, righting_time_l
 # Check residuals
 plot(simulateResiduals(righting_time_log))
 
-
-summary(righting_time_gaus)
 summary(righting_time_log)
 
 
@@ -415,27 +382,13 @@ coords <- table_data %>%
          site_num = as.factor(site_num))
 
 
-# Load GREAT map from Nikola!
-# the documentation for the creation of this in Nikola_map_making.R
-# load("~/Documents/PhD/Collaborations/Andrew Bickell/Bat_Star_Project/Data/bc_map.Rdata") 
-# bc_map <- slice # rename
-
-# better map
+# Load GREAT map from Hakai
 hakai_map <- sf::st_read("Data/Hakai_coast/COAST_TEST2.shp") %>%
   st_sf() %>%
   st_set_crs(4326)
 
-# Load the lower quality map so I can play with plots quickly
-potato_map <- sf::st_read("Data/Decent_shapefiles/eez.shp") %>%
-  st_sf() %>%
-  st_set_crs(4326)
-
-
-# Define colours
-blue <- paste("#b9d1df", sep="")
-
+# Spherical geometry
 sf_use_s2(FALSE)
-
 
 # Create legend
 site_names <- as.list(paste(coords$site_num, coords$`Site name`, sep = ": "))
@@ -447,8 +400,7 @@ smaller_map <- inset_map(map_data = hakai_map) +
   annotate("text", x = -125.756795, y = 49.807494, label = "Vancouver Island", angle = 310, size = 5)
 
 
-# make maps again
-# main map with 
+# remake main map without site legend
 main_map <-
   ggplot() +
   geom_sf(data = hakai_map, fill = "grey", colour = "white") +
@@ -507,9 +459,8 @@ main_map +
     align_to = 'panel'
   )
 
-ggsave("Pub_figs/Fig.1.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
+ggsave("Figures/Fig.1.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
 
-# Make sure to cite OSM data, "Map data © OpenStreetMap contributors" and link https://www.openstreetmap.org/copyright
 # might have to change to height = 150, width = 173 to meet journal style guide
 
 
@@ -526,7 +477,7 @@ scatter_theme(data = morphology_data,
   theme(legend.position=c(0.19, 0.85))
 
 
-ggsave("Pub_figs/Fig.2.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+ggsave("Figures/Fig.2.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
 
 
 # Figure 3: feeding ----
@@ -580,18 +531,9 @@ ggplot() +
   guides(pch = guide_legend(override.aes =
                               list(size = 3)))
 
-# ggsave("Pub_figs/Fig.3.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+ggsave("Figures/Fig.3.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
 
 
-
-# Simple geom_smooth plot
-# use scatter_theme function from Plot_themes.R
-scatter_theme(data = feeding_data, x = depth_m, y = feed_bin, arm = arm_bin) +
-  facet_wrap(~substrate,
-             labeller = as_labeller(c(S = "Sand", 
-                                      C = "Cobble", 
-                                      R = "Rock"))) +
-  labs(x = "Depth (m)", y = "Probability of bat star feeding")
 
 
 # Figure 4: righting time -----
@@ -604,7 +546,7 @@ scatter_theme(data = righting_time_data,
   theme(legend.position = c(0.1, 0.89))
 
 
-#ggsave("Pub_figs/Fig.4.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+ggsave("Figures/Fig.4.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
 
 
 # Extra -----
