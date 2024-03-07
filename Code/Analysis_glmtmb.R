@@ -6,15 +6,12 @@
 ### Loading in required packages ----
 library(tidyverse)
 library(ggplot2)
-library(lme4)
-library(nlme) # lme()
 library(TMB)
 library(glmmTMB)
 library(DHARMa)
 library(kableExtra)
 library(ggeffects)
 library(brglm) # for the community glm where there's clean separation
-library(visreg)
 
 # Packages for map
 library(sf)
@@ -30,7 +27,7 @@ library(multcomp)
 
 # package version control!
 library(renv) 
-#renv::init()
+renv::restore()
 
 # Source plot themes
 source("Code/Plot_themes.R")
