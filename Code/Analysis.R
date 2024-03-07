@@ -196,7 +196,7 @@ table_final <- table_b %>%
          Site = site) %>%
   mutate(Site = str_replace(Site, "_", " "))
 
-# write_csv(table_final, "species_site_table.csv")
+# write_csv(table_final, "Output/species_site_table.csv")
 
 
 ### Site Analysis ###
