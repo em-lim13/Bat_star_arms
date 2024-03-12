@@ -256,6 +256,18 @@ colour_table <- colour_data %>%
          total = n.y) %>%
   mutate(percent = 100*atypical/total)
 
+# percent of atypical stars that are each colour
+atypical_colour <- colour_data %>%
+  filter(arm_bin == 1) %>%
+  count(colour)%>%
+  mutate(percent = 100*n/110)
+
+# percent of typical stars that are each colour
+typical_colour <- colour_data %>%
+  filter(arm_bin == 0) %>%
+  count(colour)%>%
+  mutate(percent = 100*n/455) 
+
 # can I use a glm to get estimates?
 colour_glm <- glmmTMB(arm_bin ~ colour, 
                       family = binomial(link = 'logit'),
