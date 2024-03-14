@@ -406,7 +406,8 @@ site_names <- as.list(paste(coords$site_num, coords$`Site name`, sep = ": "))
 # main_map <- site_map(coord_data = coords, map_data = hakai_map)
 
 smaller_map <- inset_map(map_data = hakai_map) + 
-  annotate("text", x = -125.756795, y = 49.807494, label = "Vancouver Island", angle = 310, size = 5)
+  annotate("text", x = -125.756795, y = 49.807494, 
+           label = "Vancouver Island", angle = 315, size = 3.5)
 
 
 # remake main map without site legend
@@ -426,8 +427,8 @@ main_map <-
   geom_text(data = coords,
             aes(x = Longitude, y = Latitude, 
                 label = site_num),
-            fontface = "bold",
-            nudge_x = coords$xjit) +
+            nudge_x = coords$xjit,
+            size = 9/.pt) +
   # scale colour, size, and pch
   scale_size_continuous(name = "Atypical stars (%)",
                         range = c(0.1, 6),
@@ -440,12 +441,13 @@ main_map <-
   theme_bw() +
   theme(panel.background = element_rect(fill = "white"),
         panel.grid.major = element_line(color = "white"),
-        axis.text = element_text(size = 12, colour = "black"),
-        axis.title = element_text(size = 13, colour = "black"),
-        legend.title = element_text(size = 12, colour = "black"),
-        legend.text = element_text(size = 11, colour = "black"),
-        legend.margin = margin(0,0,0,0, unit="cm")) +
-  xlab("Longitude") + ylab("Latitude") +
+        axis.text = element_text(size = 8, colour = "black"),
+        axis.title = element_text(size = 8, colour = "black"),
+        legend.title = element_text(size = 9, colour = "black"),
+        legend.text = element_text(size = 8, colour = "black"),
+        legend.margin =margin(r=1,l=1,t=1,b=1),
+        legend.box.background = element_rect(colour = "black", linewidth = 0.25)) +
+        xlab("Longitude") + ylab("Latitude") +
   # add scale bar and arrow
   annotation_scale(location = "br", width_hint = 0.4) +
   annotation_north_arrow(location = "br", which_north = "true", 
@@ -454,7 +456,8 @@ main_map <-
   # guides
   guides(size = guide_legend(order = 1),
          label = guide_legend(order = 2)) + 
-  annotate("text", x = -125.121631, y = 48.870831, label = "Trevor Channel", angle = 45, size = 5)
+  annotate("text", x = -125.121631, y = 48.870831,
+           label = "Trevor Channel", angle = 45, size = 4)
 
 
 # Put site map and inset map together with patchwork
@@ -468,9 +471,11 @@ main_map +
     align_to = 'panel'
   )
 
-ggsave("Figures/Fig.1.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
+#ggsave("Figures/Fig.1.png", device = "png", height = 150, width = 250, units = c("mm"), dpi = 600)
 
-# might have to change to height = 150, width = 173 to meet journal style guide
+ggsave("Figures/Fig.1.pdf", device = "pdf", height = 100, width = 169, units = c("mm"), dpi = 400)
+
+# change to 105 mm width, which would be 63 mm height to maintain ratio???
 
 
 # Figure 2: oral SA ----
@@ -483,10 +488,14 @@ scatter_theme(data = morphology_data,
   ylab(expression(paste("Oral surface area (cm"^"2",")"))) +
   xlim(3.9, 12) +
   ylim(0, 200) +
-  theme(legend.position=c(0.19, 0.85))
+  theme(legend.position = c(0.162, 0.785))
 
 
-ggsave("Figures/Fig.2.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+#ggsave("Figures/Fig.2.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+
+ggsave("Figures/Fig.2.pdf", device = "pdf", height = 60, width = 81, units = c("mm"), dpi = 600)
+
+# change to 81 mm width, which would be 60 mm height to maintain ratio???
 
 
 # Figure 3: feeding ----
@@ -525,7 +534,7 @@ ggplot() +
              labeller = as_labeller(c(S = "(a)     ", 
                                       C = "(b)     ", 
                                       R = "(c)     "))) +
-  theme_pub()  +
+  theme_pub_10() +
   labs(y = "Probability of bat star feeding", x = "Depth (m)", colour = "Arms") +
   scale_colour_manual(values = c("#DF5E29", "#28477D"),
                       name = "Arm number",
@@ -540,7 +549,11 @@ ggplot() +
   guides(pch = guide_legend(override.aes =
                               list(size = 3)))
 
-ggsave("Figures/Fig.3.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+#ggsave("Figures/Fig.3.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+
+ggsave("Figures/Fig.3.pdf", device = "pdf", height = 126, width = 169, units = c("mm"), dpi = 600)
+
+# change to 81 mm width, which would be 60 mm height to maintain ratio???
 
 
 
@@ -552,10 +565,12 @@ scatter_theme(data = righting_time_data,
               arm = arm_bin) +
   xlab("Length of longest arm (cm)") +
   ylab("Righting time (s)") +
-  theme(legend.position = c(0.1, 0.89))
+  theme(legend.position = c(0.162, 0.785))
 
 
-ggsave("Figures/Fig.4.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+#ggsave("Figures/Fig.4.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+ggsave("Figures/Fig.4.pdf", device = "pdf", height = 60, width = 81, units = c("mm"), dpi = 600)
+
 
 
 # Extra -----
