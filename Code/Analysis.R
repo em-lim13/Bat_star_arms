@@ -475,8 +475,6 @@ main_map +
 
 ggsave("Figures/Fig.1.pdf", device = "pdf", height = 100, width = 169, units = c("mm"), dpi = 400)
 
-# change to 105 mm width, which would be 63 mm height to maintain ratio???
-
 
 # Figure 2: oral SA ----
 # plot
@@ -494,8 +492,6 @@ scatter_theme(data = morphology_data,
 #ggsave("Figures/Fig.2.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
 
 ggsave("Figures/Fig.2.pdf", device = "pdf", height = 60, width = 81, units = c("mm"), dpi = 600)
-
-# change to 81 mm width, which would be 60 mm height to maintain ratio???
 
 
 # Figure 3: feeding ----
@@ -553,9 +549,6 @@ ggplot() +
 
 ggsave("Figures/Fig.3.pdf", device = "pdf", height = 126, width = 169, units = c("mm"), dpi = 600)
 
-# change to 81 mm width, which would be 60 mm height to maintain ratio???
-
-
 
 
 # Figure 4: righting time -----
@@ -569,6 +562,7 @@ scatter_theme(data = righting_time_data,
 
 
 #ggsave("Figures/Fig.4.png", device = "png", height = 130, width = 173, units = c("mm"), dpi = 600)
+
 ggsave("Figures/Fig.4.pdf", device = "pdf", height = 60, width = 81, units = c("mm"), dpi = 600)
 
 
