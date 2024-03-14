@@ -26,11 +26,34 @@ theme_pub <- function() {
           strip.text.y = element_text(size = 10, color = "black",angle = -90))
 }
 
+# smaller dimensions
+theme_pub_10 <- function() {
+  
+  theme_bw() +
+    theme(axis.text = element_text(colour = "black", size = 8),
+          axis.title = element_text(colour = "black", size = 9),
+          # Panel things
+          panel.border = element_rect(colour = "black", fill=NA, linewidth = 1),
+          panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+          # Legend
+          legend.background = element_blank(),
+          legend.box.background = element_rect(colour = "black", linewidth = 0.25),
+          legend.text = element_text(colour = "black", size = 8),
+          legend.title = element_text(colour = "black", size = 8),
+          legend.margin =margin(r=1,l=1,t=1,b=1),
+          # Facet
+          strip.background = element_rect(fill = "white", color = "white"),  
+          strip.text = element_text(hjust = 0),
+          strip.text.x = element_text(size = 8, color = "black"),  
+          strip.text.y = element_text(size = 8, color = "black",angle = -90))
+}
+
+
 # Scatter plot theme ----
 scatter_theme <- function(data, x, y, arm){
   ggplot(data, aes(x = {{x}}, y = {{y}}, colour = {{arm}}, pch = {{arm}}, fill = {{arm}}, lty = {{arm}})) +
-    geom_point() +
-    geom_smooth(method = "lm") +
+    geom_point(alpha = 0.9, size = 1) +
+    geom_smooth(method = "lm", linewidth = 0.5) +
     scale_colour_manual(values = c("#DF5E29", "#28477D"),
                         name = "Arm number",
                         labels = c("Typical", "Atypical"),
@@ -43,7 +66,8 @@ scatter_theme <- function(data, x, y, arm){
                       labels = c("Typical", "Atypical")) +
     scale_linetype_discrete(name = "Arm number",
                             labels = c("Typical", "Atypical")) +
-    theme_pub()
+    theme_pub_10() +
+    guides(colour = guide_legend(override.aes = list(size = 2)))
 }
 
 # Annotation -----
