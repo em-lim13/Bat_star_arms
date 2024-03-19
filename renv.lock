@@ -2353,16 +2353,6 @@
       ],
       "Hash": "55e157e2aa88161bdb0754218470d204"
     },
-    "visreg": {
-      "Package": "visreg",
-      "Version": "2.7.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "lattice"
-      ],
-      "Hash": "f8f4418faf69c4b1c0814bb0b9781d76"
-    },
     "vroom": {
       "Package": "vroom",
       "Version": "1.5.7",

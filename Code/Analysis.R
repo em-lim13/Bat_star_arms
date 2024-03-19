@@ -28,6 +28,8 @@ library(multcomp)
 # package version control!
 library(renv) 
 renv::restore()
+renv::snapshot()
+
 
 # Source plot themes
 source("Code/Plot_themes.R")
