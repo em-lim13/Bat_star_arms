@@ -56,16 +56,16 @@ scatter_theme <- function(data, x, y, arm){
     geom_smooth(method = "lm", linewidth = 0.5) +
     scale_colour_manual(values = c("#DF5E29", "#28477D"),
                         name = "Arm number",
-                        labels = c("Typical", "Atypical"),
+                        labels = c("5", "6+"),
                         guide = guide_legend(override.aes = 
                                  list(size = 3))) +
     scale_shape_discrete(name = "Arm number",
-                         labels = c("Typical", "Atypical")) +
+                         labels = c("5", "6+")) +
     scale_fill_manual(values = c("#DF5E29", "#28477D"),
                       name = "Arm number",
-                      labels = c("Typical", "Atypical")) +
+                      labels = c("5", "6+")) +
     scale_linetype_discrete(name = "Arm number",
-                            labels = c("Typical", "Atypical")) +
+                            labels = c("5", "6+")) +
     theme_pub_10() +
     guides(colour = guide_legend(override.aes = list(size = 2)))
 }
